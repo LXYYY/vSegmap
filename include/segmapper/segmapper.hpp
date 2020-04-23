@@ -15,8 +15,8 @@
 #include <std_srvs/Empty.h>
 #include <tf/transform_broadcaster.h>
 
-//#include "segmapper/SaveMap.h"
-#include <ros/ros.h>
+#include "segmapper/SaveMap.h"
+#include "segmapper/v_slam_worker.h"
 
 struct SegMapperParams {
   // Multi robot parameters.
@@ -40,23 +40,8 @@ class SegMapper {
   explicit SegMapper(ros::NodeHandle& n);
   ~SegMapper();
 
-  /// \brief A thread function for handling map publishing.
-  void publishMapThread();
-
-  /// \brief A thread function for updating the transform between world and odom.
-  void publishTfThread();
-
   /// \brief A thread function for localizing and closing loops with SegMatch.
   void segMatchThread();
-
- protected:
-  /// \brief Call back of the save_map service.
-  //bool saveMapServiceCall(segmapper::SaveMap::Request& request,
-   //                       segmapper::SaveMap::Response& response);
-
-    /// \brief Call back of the save_local_map service.
-  //bool saveLocalMapServiceCall(segmapper::SaveMap::Request& request,
-   //                            segmapper::SaveMap::Response& response);
 
  private:
   // Get ROS parameters.
@@ -69,6 +54,9 @@ class SegMapper {
   // Node handle.
   ros::NodeHandle& nh_;
 
+  v_slam::VSlamWorker v_slam_worker_;
+  v_slam::VSlamWorkerParams v_slam_params_;
+
   // Publisher of the local maps
   ros::Publisher local_map_pub_;
   static constexpr unsigned int kPublisherQueueSize = 50u;
@@ -79,28 +67,15 @@ class SegMapper {
 
   tf::TransformBroadcaster tf_broadcaster_;
 
-  // Services.
-  ros::ServiceServer save_distant_map_;
-  ros::ServiceServer save_map_;
-  ros::ServiceServer save_local_map_;
-  ros::ServiceServer show_statistics_;
-
-  // Incremental estimator.
-  std::shared_ptr<laser_slam::IncrementalEstimator> incremental_estimator_;
-
   // SegMatch objects.
   segmatch_ros::SegMatchWorkerParams segmatch_worker_params_;
   segmatch_ros::SegMatchWorker segmatch_worker_;
   static constexpr double kSegMatchSleepTime_s = 0.01;
 
-  // laser_slam objects.
-  std::vector<std::unique_ptr<laser_slam_ros::LaserSlamWorker> > laser_slam_workers_;
-  laser_slam_ros::LaserSlamWorkerParams laser_slam_worker_params_;
-
   std::vector<unsigned int> skip_counters_;
   unsigned int deactivate_track_when_skipped_x_ = 5u;
   std::vector<bool> first_points_received_;
-
+  
   // Pose of the robot when localization occured. Used to compute statistics on dead-reckoning
   // distances.
   laser_slam::SE3 pose_at_last_localization_;
@@ -108,6 +83,13 @@ class SegMapper {
 
 
   static constexpr laser_slam::Time kHeadDurationToExport_ns = 60000000000u;
+
+public:
+
+private:
+  std::string mimic_scan_topic;
+  std::string mimic_pose_topic;
+  double mimic_pub_rate_hz;
 }; // SegMapper
 
 #endif /* SEGMAPPER_SEGMAPPER_HPP_ */
