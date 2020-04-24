@@ -1,10 +1,16 @@
 #include <thread>
 
+#include <glog/logging.h>
 #include <ros/ros.h>
 
 #include "segmapper/segmapper.hpp"
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
+  google::InitGoogleLogging(argv[0]);
+  FLAGS_log_dir = "/home/lxy/segmap_ws/logs/vSegmapper/";
+  google::InstallFailureSignalHandler();
+
   ros::init(argc, argv, "SegMapper");
   ros::NodeHandle node_handle("~");
 
@@ -16,12 +22,10 @@ int main(int argc, char **argv) {
 
   try {
     ros::spin();
-  }
-  catch (const std::exception& e) {
+  } catch (const std::exception& e) {
     ROS_ERROR_STREAM("Exception: " << e.what());
     return 1;
-  }
-  catch (...) {
+  } catch (...) {
     ROS_ERROR_STREAM("Unknown Exception");
     return 1;
   }

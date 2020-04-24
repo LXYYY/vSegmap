@@ -8,17 +8,16 @@ SegMapper: {
   publish_world_to_odom: true,
   tf_publication_rate_hz: 10,
   
-  mimic_scan_topic: "/mimic_laser_slam/mimic_scan_points",
-  mimic_pose_topic: "/mimic_laser_slam/mimic_pose",
   mimic_pub_rate_hz: 10,
 
-  LaserSlamWorker: {
+  VSlamWorker: {
     use_odometry_information: true,
     
     odom_frame: "world",
     sensor_frame: "velodyne",
     
-    assembled_cloud_sub_topic: "/velodyne_points",
+    assembled_cloud_sub_topic: "/mimic_scan_points",
+    assembled_pose_sub_topic: "/mimic_pose",
     trajectory_pub_topic: "trajectory",
     odometry_trajectory_pub_topic: "odometry_trajectory",
     full_map_pub_topic: "full_map",

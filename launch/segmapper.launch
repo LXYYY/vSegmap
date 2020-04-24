@@ -2,9 +2,13 @@
 	
 <launch>
   <!-- ICP configuration file -->
-  <arg name="icp_configuration_file" default="$(find segmapper)/launch/icp_dynamic_indoor.yaml"/>
+  <arg name="icp_configuration_file" default="$(find vSegmapper)/launch/kitti/icp_dynamic_outdoor.yaml"/>
+  
   <!-- Input filters file -->
-  <arg name="icp_input_filters_file" default="$(find segmapper)/launch/input_filters_indoor.yaml"/>
+  <arg name="icp_input_filters_file" default="$(find vSegmapper)/launch/kitti/input_filters_outdoor.yaml"/>
+  
+  <!-- log file -->
+  <arg name="node_res_log" default="$(find vSegmapper)/logs/lc_result_log.txt"/>
   
   <!-- Enable callgrind profiling -->
   <arg name="enable_callgrind" default="false"/>
@@ -13,7 +17,7 @@
   <arg name="launch_prefix" value="" unless="$(arg enable_callgrind)"/>
 
   <!-- segmapper node -->
-  <node name="segmapper" pkg="segmapper" type="segmapper_node" output="screen" respawn="false" launch-prefix="$(arg launch_prefix)">
+  <node name="vSegmapper" pkg="vSegmapper" type="vSegmapper_node" output="log" respawn="false" launch-prefix="$(arg launch_prefix)">
     <param name="icp_configuration_file" value="$(arg icp_configuration_file)"/>
     <param name="icp_input_filters_file" value="$(arg icp_input_filters_file)"/>
   </node>
